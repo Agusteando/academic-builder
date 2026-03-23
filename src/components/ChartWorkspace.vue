@@ -11,29 +11,30 @@ const generatedTitle = computed(() => {
   if (!props.options) return "Configura los parámetros para visualizar datos";
   const { sheets, subjects, grouping } = props.selections;
   const subjStr = subjects.includes('__avg__') ? 'Promedios Generales' : (subjects.length === 1 ? 'Materia Específica' : 'Comparativa de Materias');
-  const context = grouping === 'period' ? 'a través de Periodos' : 'por Grado Escolar';
+  const context = grouping === 'period' ? 'a través de Periodos' : 'por Grados Académicos';
   return `Análisis de ${subjStr} ${context}`;
 });
 
 const exportCSV = () => {
   if (!props.options) return;
-  const labels = props.options.xAxis.data;
+  // Clean up structural gap keys out of CSV headers
+  const labels = props.options.xAxis.data.map(lbl => lbl === '' ? 'Separador' : lbl);
   const rows = [ ['Serie', ...labels].join(',') ];
   
-  props.options.series.forEach((s, idx) => {
-    // Al desempaquetar las series, incluimos el nombre de la materia entre paréntesis por si existen sub-divisiones
+  props.options.series.forEach(s => {
+    // Map missing gaps with blanks safely
     const rowData = s.data.map(d => {
         if (!d || d.value == null) return '';
-        return `"${d.value} (${d.meta.materia})"`;
+        return `"${d.value}"`;
     });
-    rows.push([ `"${s.name} [SubSerie ${idx + 1}]"`, ...rowData ].join(','));
+    rows.push([ `"${s.name}"`, ...rowData ].join(','));
   });
   
   const blob = new Blob([rows.join('\n')], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = 'reporte_academico.csv';
+  a.download = 'reporte_academico_estructurado.csv';
   a.click();
   URL.revokeObjectURL(url);
 };
@@ -49,7 +50,7 @@ const exportCSV = () => {
         <div>
           <h2 class="text-2xl font-bold text-slate-800 tracking-tight">{{ generatedTitle }}</h2>
           <p class="text-sm text-slate-500 mt-1">
-            {{ options ? 'Haz hover en la gráfica para ver detalles. Usa la barra superior de la gráfica para zoom/imágenes.' : 'Selecciona planteles, periodos, materias y grados en el panel lateral.' }}
+            {{ options ? 'Haz hover en la gráfica para ver detalles. Las agrupaciones están delimitadas semánticamente.' : 'Selecciona planteles, periodos, materias y grados en el panel lateral.' }}
           </p>
         </div>
 

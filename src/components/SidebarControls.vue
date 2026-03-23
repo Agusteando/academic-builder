@@ -39,8 +39,8 @@ const props = defineProps({
       <div class="pt-4 border-t border-slate-100 space-y-4">
         <div class="control-group"><label>Eje X (Agrupar por)</label>
           <select v-model="selections.grouping" class="custom-select single">
-            <option value="period">Comparar Periodos</option>
-            <option value="grade">Comparar Grados</option>
+            <option value="grade">Comparar por Grado (Bloques)</option>
+            <option value="period">Comparar por Periodo</option>
           </select>
         </div>
 
@@ -64,22 +64,22 @@ const props = defineProps({
           <SlidersHorizontal :size="14" /> Diseño y Espaciado
         </div>
         <div class="control-group">
-          <label>Separación entre Barras ({{ selections.barGap }})</label>
+          <label>Separación Interna (Entre Familias) ({{ selections.barGap }})</label>
           <input type="range" min="0" max="100" step="5" :value="parseInt(selections.barGap)" @input="e => selections.barGap = e.target.value + '%'" class="w-full accent-brand-500">
         </div>
         <div class="control-group">
-          <label>Separación entre Clústeres ({{ selections.categoryGap }})</label>
+          <label>Separación Externa (Entre Grados) ({{ selections.categoryGap }})</label>
           <input type="range" min="10" max="80" step="5" :value="parseInt(selections.categoryGap)" @input="e => selections.categoryGap = e.target.value + '%'" class="w-full accent-brand-500">
         </div>
       </div>
       
       <div v-if="Object.keys(customColors).length" class="pt-4 border-t border-slate-100">
-        <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Color Base por Grupo</label>
+        <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Tono Base por Plantel (Familia)</label>
         <div class="space-y-2">
-          <!-- Iterar sobre las Keys base generadas por el Motor Dinámico -->
-          <div v-for="(color, groupName) in customColors" :key="groupName" class="flex items-center gap-2">
-            <input type="color" v-model="customColors[groupName]" class="w-6 h-6 rounded cursor-pointer border-0 p-0 bg-transparent shrink-0">
-            <span class="text-xs text-slate-600 truncate flex-1 font-medium" :title="groupName">{{ groupName }}</span>
+          <!-- Iterate base keys mapping to Planteles -->
+          <div v-for="(color, plantelName) in customColors" :key="plantelName" class="flex items-center gap-2">
+            <input type="color" v-model="customColors[plantelName]" class="w-6 h-6 rounded cursor-pointer border-0 p-0 bg-transparent shrink-0">
+            <span class="text-xs text-slate-600 truncate flex-1 font-medium" :title="plantelName">{{ plantelName }}</span>
           </div>
         </div>
       </div>

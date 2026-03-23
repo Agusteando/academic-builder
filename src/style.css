@@ -1,0 +1,15 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom scrollbar for clean multi-selects */
+select[multiple]::-webkit-scrollbar {
+  width: 6px;
+}
+select[multiple]::-webkit-scrollbar-track {
+  background: transparent;
+}
+select[multiple]::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1;
+  border-radius: 10px;
+}

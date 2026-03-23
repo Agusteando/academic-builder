@@ -1,6 +1,6 @@
 <script setup>
 import { computed } from 'vue';
-import { Download, Table } from 'lucide-vue-next';
+import { Download, Table, BarChart3 } from 'lucide-vue-next';
 
 const props = defineProps({
   options: Object,
@@ -20,11 +20,16 @@ const exportCSV = () => {
   const labels = props.options.xAxis.data;
   const rows = [ ['Serie', ...labels].join(',') ];
   
-  props.options.series.forEach(s => {
-    rows.push([ `"${s.name}"`, ...s.data.map(d => d ?? '') ].join(','));
+  props.options.series.forEach((s, idx) => {
+    // Al desempaquetar las series, incluimos el nombre de la materia entre paréntesis por si existen sub-divisiones
+    const rowData = s.data.map(d => {
+        if (!d || d.value == null) return '';
+        return `"${d.value} (${d.meta.materia})"`;
+    });
+    rows.push([ `"${s.name} [SubSerie ${idx + 1}]"`, ...rowData ].join(','));
   });
   
-  const blob = new Blob([rows.join('\n')], { type: 'text/csv' });
+  const blob = new Blob([rows.join('\n')], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
@@ -57,12 +62,14 @@ const exportCSV = () => {
       <!-- Chart Container -->
       <div class="bg-white border border-slate-200 rounded-xl shadow-sm flex-1 min-h-[500px] relative p-4 flex flex-col">
         
-        <div v-if="!options" class="absolute inset-0 flex flex-col items-center justify-center text-slate-400 gap-3">
+        <!-- Estado Vacío -->
+        <div v-if="!options" class="absolute inset-0 flex flex-col items-center justify-center text-slate-400 gap-3 z-10">
           <BarChart3 :size="48" stroke-width="1" />
           <p class="text-sm font-medium">No hay suficientes datos seleccionados.</p>
         </div>
 
-        <v-chart v-else class="w-full h-full flex-1" :option="options" autoresize />
+        <!-- Gráfica ECharts -->
+        <v-chart v-else class="echarts-container w-full h-full flex-1" :option="options" autoresize />
       </div>
 
     </div>
@@ -70,8 +77,9 @@ const exportCSV = () => {
 </template>
 
 <style scoped>
-.echarts {
-  width: 100%;
-  height: 100%;
+.echarts-container {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 450px;
 }
 </style>

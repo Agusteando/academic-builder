@@ -73,12 +73,13 @@ const props = defineProps({
         </div>
       </div>
       
-      <div v-if="chartOptions && chartOptions.series.length" class="pt-4 border-t border-slate-100">
-        <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Colores de Serie</label>
+      <div v-if="Object.keys(customColors).length" class="pt-4 border-t border-slate-100">
+        <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Color Base por Grupo</label>
         <div class="space-y-2">
-          <div v-for="series in chartOptions.series" :key="series.name" class="flex items-center gap-2">
-            <input type="color" v-model="customColors[series.name]" class="w-6 h-6 rounded cursor-pointer border-0 p-0 bg-transparent shrink-0">
-            <span class="text-xs text-slate-600 truncate flex-1" :title="series.name">{{ series.name }}</span>
+          <!-- Iterar sobre las Keys base generadas por el Motor Dinámico -->
+          <div v-for="(color, groupName) in customColors" :key="groupName" class="flex items-center gap-2">
+            <input type="color" v-model="customColors[groupName]" class="w-6 h-6 rounded cursor-pointer border-0 p-0 bg-transparent shrink-0">
+            <span class="text-xs text-slate-600 truncate flex-1 font-medium" :title="groupName">{{ groupName }}</span>
           </div>
         </div>
       </div>

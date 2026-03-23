@@ -11,17 +11,18 @@ export function useAcademicData() {
     periods: [],
     subjects: [],
     grades: [],
-    grouping: 'period', // 'period' or 'grade'
+    grouping: 'period', 
     chartType: 'bar',
-    palette: 'soft'
+    palette: 'pastelSoft',
+    // NUEVOS CONTROLES DE ESPACIADO
+    barGap: '15%',        // Separación entre barras del mismo grupo (ej. Planteles)
+    categoryGap: '30%'    // Separación entre los clústeres principales
   });
 
   const loadData = async () => {
     try {
       const response = await fetch(DATA_API_URL);
       rawData.value = await response.json();
-      
-      // Auto-select initial defaults
       if (availableSheets.value.length) selections.sheets = [availableSheets.value[0]];
     } catch (err) {
       error.value = "No se pudo cargar la información académica.";
@@ -64,9 +65,7 @@ export function useAcademicData() {
           p.subjects
             .filter(sb => activeSubjects.length === 0 || activeSubjects.includes(sb.name))
             .forEach(sb => {
-              Object.keys(sb.grades).forEach(k => {
-                if (/^\d+$/.test(k)) set.add(k);
-              });
+              Object.keys(sb.grades).forEach(k => { if (/^\d+$/.test(k)) set.add(k); });
             });
         });
     });
@@ -79,7 +78,6 @@ export function useAcademicData() {
     ];
   });
 
-  // Cascade resets
   watch(() => selections.sheets, () => {
     selections.periods = selections.periods.filter(p => availablePeriods.value.includes(p));
     if(!selections.periods.length && availablePeriods.value.length) selections.periods = [availablePeriods.value[0]];
